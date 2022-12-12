@@ -6,6 +6,7 @@ import com.video.platform.service.UserService;
 import com.video.platform.service.util.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.video.platform.api.support.UserSupport;
 
 
 @RestController
@@ -14,6 +15,16 @@ public class UserApi {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserSupport userSupport;
+
+    @GetMapping("/users")
+    public JsonResponse<User> getUserInfo(){
+        Long userId = userSupport.getCurrentUserId();
+        User user = userService.getUserInfo(userId);
+        return new JsonResponse<>(user);
+    }
 
 
     @GetMapping("/rsa-pks")
@@ -29,8 +40,10 @@ public class UserApi {
     }
 
     @PostMapping("/user-tokens")
-    public JsonResponse<String> login (@RequestBody User user) {
+    public JsonResponse<String> login (@RequestBody User user) throws Exception{
         String token = userService.login(user);
         return  new JsonResponse<>(token);
     }
+
+
 }
