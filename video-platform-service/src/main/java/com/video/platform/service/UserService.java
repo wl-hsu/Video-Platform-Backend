@@ -8,6 +8,7 @@ import com.video.platform.domain.constant.UserConstant;
 import com.video.platform.domain.exception.ConditionException;
 import com.video.platform.service.util.MD5Util;
 import com.video.platform.service.util.RSAUtil;
+import com.video.platform.service.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -54,5 +55,34 @@ public class UserService {
 
     public User getUserByPhone(String phone) {
         return userDao.getUserByPhone(phone);
+    }
+
+    public String login(User user) {
+        String phone = user.getPhone();
+        if (StringUtils.isNullOrEmpty(phone)){
+            throw  new ConditionException("phone number is required");
+
+        }
+        User dbUser = this.getUserByPhone(phone);
+        if (dbUser == null) {
+            throw new ConditionException("User is not exists");
+        }
+        String password = user.getPassword();
+        String rawPassword;
+        try{
+            rawPassword = RSAUtil.decrypt(password);
+
+        } catch (Exception e) {
+            throw new ConditionException("decrypt failure");
+        }
+        String salt = dbUser.getSalt();
+        String md5Password = MD5Util.sign(rawPassword, salt, "UTF-8");
+        if (!md5Password.equals(dbUser.getPassword())) {
+            throw new ConditionException("User or password is not correct");
+        }
+        TokenUtil tokenUtil = new TokenUtil();
+        return tokenUtil.generateToken(dbUser.getId());
+
+
     }
 }
