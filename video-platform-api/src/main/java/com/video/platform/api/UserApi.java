@@ -2,6 +2,7 @@ package com.video.platform.api;
 
 import com.video.platform.domain.JsonResponse;
 import com.video.platform.domain.User;
+import com.video.platform.domain.UserInfo;
 import com.video.platform.service.UserService;
 import com.video.platform.service.util.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,20 @@ public class UserApi {
         return  new JsonResponse<>(token);
     }
 
+    @PutMapping("/users")
+    public JsonResponse<String> updateUsers(@RequestBody User user) throws Exception {
+        Long userId = userSupport.getCurrentUserId();
+        user.setId(userId);
+        userService.updateUsers(user);
+        return JsonResponse.success();
+    }
 
+    @PutMapping("/user-infos")
+    public JsonResponse<String> updateUsersInfos(@RequestBody UserInfo userInfo) {
+        Long userId = userSupport.getCurrentUserId();
+        userInfo.setUserId(userId);
+        userService.updateUserInfos(userInfo);
+        return JsonResponse.success();
+
+    }
 }

@@ -18,7 +18,7 @@ public class TokenUtil {
         Algorithm algorithm = Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey());
         Calendar calender = Calendar.getInstance();
         calender.setTime(new Date());
-        calender.add(Calendar.SECOND, 30);
+        calender.add(Calendar.SECOND, 300);
         return JWT.create().withKeyId(String.valueOf(userId))
                 .withIssuer(ISSUER)
                 .withExpiresAt(calender.getTime())
