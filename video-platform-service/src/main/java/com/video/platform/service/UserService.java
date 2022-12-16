@@ -58,12 +58,13 @@ public class UserService {
     }
 
     public String login(User user) throws Exception{
-        String phone = user.getPhone();
-        if (StringUtils.isNullOrEmpty(phone)){
+        String phone = user.getPhone() == null ? "": user.getPhone();
+        String email = user.getEmail() == null ? "": user.getEmail();
+        if (StringUtils.isNullOrEmpty(phone) && StringUtils.isNullOrEmpty(email)){
             throw  new ConditionException("phone number is required");
 
         }
-        User dbUser = this.getUserByPhone(phone);
+        User dbUser = userDao.getUserByPhoneOrEmail(phone, email);
         if (dbUser == null) {
             throw new ConditionException("User is not exists");
         }
@@ -86,10 +87,32 @@ public class UserService {
 
     }
 
+
+
     public User getUserInfo(Long userId) {
         User user = userDao.getUserById(userId);
         UserInfo userInfo = userDao.getUserInfoByUserId(userId);
         user.setUserInfo(userInfo);
         return user;
+    }
+    
+    public void updateUsers(User user) throws Exception {
+        Long id = user.getId();
+        User dbUser = userDao.getUserById(id);
+        if (dbUser == null) {
+            throw new ConditionException("user not exists");
+        }
+        if (!StringUtils.isNullOrEmpty(user.getPassword())) {
+            String rawPassword = RSAUtil.decrypt(user.getPassword());
+            String md5Password = MD5Util.sign(rawPassword, dbUser.getSalt(), "UTF-8");
+            user.setPassword(md5Password);
+        }
+        user.setUpdateTime(new Date());
+        userDao.updateUsers(user);
+    }
+
+    public void updateUserInfos(UserInfo userInfo) {
+        userInfo.setUpdateTime(new Date());
+        userDao.updateUserInfos(userInfo);
     }
 }
