@@ -11,4 +11,7 @@ public interface UserConstant {
 
     public static final String DEFAULT_NICK = "JOHN DOE";
 
+
+    public static final String DEFAULT_USER_FOLLOWING_TYPE= "2";
+
 }
