@@ -6,6 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+
 @Mapper
 public interface UserDao {
 
@@ -25,4 +28,6 @@ public interface UserDao {
     User getUserByPhoneOrEmail(@Param("phone") String phone, @Param("email") String email);
 
     Integer updateUserInfos(UserInfo userInfo);
+
+    List<UserInfo> getUserInfoByUserIds(Set<Long> userIdList);
 }
