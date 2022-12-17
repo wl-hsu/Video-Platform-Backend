@@ -24,4 +24,13 @@
                 #{createTime}
             )
     </insert>
-</mapper>
+
+    <select id="getUserFollowings" parameterType="java.lang.Long" resultType="com.video.platform.domain.UserFollowing">
+        select
+            *
+        from
+            t_user_following
+        where
+            userId = #{userId}
+    </select>
+ </mapper>
