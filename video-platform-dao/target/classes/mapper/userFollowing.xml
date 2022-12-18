@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.video.platform.dao.UserFollowingDao">
 
     <delete id="deleteUserFollowing">
         delete from
             t_user_following
         where
-            userId = #{userId} and followingId = # {followingId}
-
+            userId = #{userId} and followingId = #{followingId}
     </delete>
 
     <insert id="addUserFollowing" parameterType="com.video.platform.domain.UserFollowing">
-        insert in
+        insert into
             t_user_following(
-                userId,
-                followingId,
-                groupId,
-                createTime
-            )value(
-                #{userId},
-                #{followingId},
-                #{groupId},
-                #{createTime}
-            )
+            userId,
+            followingId,
+            groupId,
+            createTime
+        )values(
+                   #{userId},
+                   #{followingId},
+                   #{groupId},
+                   #{createTime}
+               )
     </insert>
 
     <select id="getUserFollowings" parameterType="java.lang.Long" resultType="com.video.platform.domain.UserFollowing">
@@ -33,4 +34,14 @@
         where
             userId = #{userId}
     </select>
- </mapper>
+
+    <select id="getUserFans" parameterType="java.lang.Long" resultType="com.video.platform.domain.UserFollowing">
+        select
+            *
+        from
+            t_user_following
+        where
+            followingId = #{followingId}
+    </select>
+
+</mapper>
