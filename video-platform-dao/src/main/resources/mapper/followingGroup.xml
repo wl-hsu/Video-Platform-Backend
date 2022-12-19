@@ -31,6 +31,30 @@
 
     </select>
 
+    <insert id="addFollowingGroup" parameterType="com.video.platform.domain.FollowingGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into
+            t_following_group(
+            userId,
+            `name`,
+            `type`,
+            createTime
+        )values(
+            #{userId},
+            #{name},
+            #{type},
+            #{createTime}
+        )
+    </insert>
+
+    <select id="getUserFollowingGroups" parameterType="java.lang.Long" resultType="com.video.platform.domain.FollowingGroup">
+        select
+            *
+        from
+            t_following_group
+        where
+            userId = #{userId}
+    </select>
+
 
 
 </mapper>

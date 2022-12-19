@@ -1,5 +1,6 @@
 package com.video.platform.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import com.video.platform.domain.User;
 import com.video.platform.domain.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
@@ -7,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Mapper
@@ -30,4 +32,8 @@ public interface UserDao {
     Integer updateUserInfos(UserInfo userInfo);
 
     List<UserInfo> getUserInfoByUserIds(Set<Long> userIdList);
+
+    Integer pageCountUserInfos(Map<String, Object> params);
+
+    List<UserInfo> pageListUserInfos(JSONObject params);
 }
