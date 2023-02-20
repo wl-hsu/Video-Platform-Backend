@@ -25,6 +25,9 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserAuthService userAuthService;
+
     public void addUser(User user) {
         String phone = user.getPhone();
         if (StringUtils.isNullOrEmpty(phone)) {
@@ -56,6 +59,9 @@ public class UserService {
         userInfo.setGender(UserConstant.GENDER_UNKNOWN);
         userInfo.setCreateTime(now);
         userDao.addUserInfo(userInfo);
+        //add default user role
+        userAuthService.addUserDefaultRole(user.getId());
+
 
     }
 
