@@ -1,6 +1,7 @@
 package com.video.platform.service;
 
 import com.video.platform.domain.auth.*;
+import com.video.platform.domain.constant.AuthRoleConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,13 @@ public class UserAuthService {
         return userAuthorities;
     }
 
-
+    // set all new user as Lv0 role
+    public void addUserDefaultRole(Long id) {
+        UserRole userRole = new UserRole();
+        AuthRole role = authRoleService.getRoleByCode(AuthRoleConstant.ROLE_LV0);
+        userRole.setUserId(id);
+        userRole.setRoleId(role.getId());
+        userRoleService.addUserRole(userRole);
+    }
 }
 
