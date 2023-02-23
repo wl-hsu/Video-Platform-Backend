@@ -1,7 +1,10 @@
 package com.video.platform.service.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -32,4 +35,5 @@ public class MD5Util {
 			return content.getBytes();
 		}
 	}
+	
 }
