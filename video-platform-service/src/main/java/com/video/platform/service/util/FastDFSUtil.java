@@ -12,6 +12,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +41,7 @@ public class FastDFSUtil {
 
     private static final String DEFAULT_GROUP = "group1";
 
+    // 2Mb
     private static final int SLICE_SIZE = 1024 * 1024 * 2;
 
     public String getFileType(MultipartFile file){
@@ -116,6 +120,39 @@ public class FastDFSUtil {
         return resultPath;
     }
 
+
+    public void convertFileToSlices(MultipartFile multipartFile) throws Exception{
+        String fileType = this.getFileType(multipartFile);
+        // Generate temporary files, convert multipartFile to file
+        File file = this.multipartFileToFile(multipartFile);
+        long fileLength = file.length();
+        int count = 1;
+        for(int i = 0; i < fileLength; i += SLICE_SIZE){
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
+            randomAccessFile.seek(i);
+            byte[] bytes = new byte[SLICE_SIZE];
+            int len = randomAccessFile.read(bytes);
+            String path = "D:\\SideProject\\Video-Platform-Backend\\" + count + "." + fileType;
+            File slice = new File(path);
+            FileOutputStream fos = new FileOutputStream(slice);
+            fos.write(bytes, 0, len);
+            fos.close();
+            randomAccessFile.close();
+            count++;
+        }
+        // delete temporary files
+        file.delete();
+    }
+
+    public File multipartFileToFile(MultipartFile multipartFile) throws Exception{
+        String originalFileName = multipartFile.getOriginalFilename();
+        String[] fileName = originalFileName.split("\\.");
+        File file = File.createTempFile(fileName[0], "." + fileName[1]);
+        multipartFile.transferTo(file);
+        return file;
+    }
+
+
     // delete
     public void deleteFile(String filePath){
 
@@ -124,3 +161,5 @@ public class FastDFSUtil {
 
 
 }
+
+
