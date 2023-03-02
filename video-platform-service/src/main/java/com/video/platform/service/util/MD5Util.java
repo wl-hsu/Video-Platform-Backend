@@ -35,5 +35,18 @@ public class MD5Util {
 			return content.getBytes();
 		}
 	}
-	
+
+	// Get the md5 encrypted string of the file
+	public static String getFileMD5(MultipartFile file) throws Exception {
+		InputStream fis = file.getInputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int byteRead;
+		while((byteRead = fis.read(buffer)) > 0){
+			baos.write(buffer, 0, byteRead);
+		}
+		fis.close();
+		return DigestUtils.md5Hex(baos.toByteArray());
+	}
+
 }
