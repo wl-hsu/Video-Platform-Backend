@@ -1,14 +1,15 @@
 package com.video.platform.service;
 
 import com.video.platform.dao.VideoDao;
+import com.video.platform.domain.PageResult;
 import com.video.platform.domain.Video;
 import com.video.platform.domain.VideoTag;
+import com.video.platform.domain.exception.ConditionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class VideoService {
@@ -28,5 +29,21 @@ public class VideoService {
             item.setVideoId(videoId);
         });
         videoDao.batchAddVideoTags(tagList);
+    }
+
+    public PageResult<Video> pageListVideos(Integer size, Integer no, String area) {
+        if(size == null || no == null){
+            throw new ConditionException("parameter error！");
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("start", (no-1)*size);
+        params.put("limit", size);
+        params.put("area" , area);
+        List<Video> list = new ArrayList<>();
+        Integer total = videoDao.pageCountVideos(params);
+        if(total > 0){
+            list = videoDao.pageListVideos(params);
+        }
+        return new PageResult<>(total, list);
     }
 }
