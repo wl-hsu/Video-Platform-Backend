@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
@@ -41,6 +43,16 @@ public class VideoApi {
     public JsonResponse<PageResult<Video>> pageListVideos(Integer size, Integer no, String area){
         PageResult<Video> result = videoService.pageListVideos(size, no ,area);
         return new JsonResponse<>(result);
+    }
+
+    /**
+     * play video
+     */
+    @GetMapping("/video-slices")
+    public void viewVideoOnlineBySlices(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        String url) {
+        videoService.viewVideoOnlineBySlices(request, response, url);
     }
 
 }
