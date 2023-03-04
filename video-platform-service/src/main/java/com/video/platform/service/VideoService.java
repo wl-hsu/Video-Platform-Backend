@@ -5,10 +5,13 @@ import com.video.platform.domain.PageResult;
 import com.video.platform.domain.Video;
 import com.video.platform.domain.VideoTag;
 import com.video.platform.domain.exception.ConditionException;
+import com.video.platform.service.util.FastDFSUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @Service
@@ -16,6 +19,9 @@ public class VideoService {
 
     @Autowired
     private VideoDao videoDao;
+
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     @Transactional
     public void addVideos(Video video) {
@@ -45,5 +51,13 @@ public class VideoService {
             list = videoDao.pageListVideos(params);
         }
         return new PageResult<>(total, list);
+    }
+
+    public void viewVideoOnlineBySlices(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        String url) {
+        try{
+            fastDFSUtil.viewVideoOnlineBySlices(request, response, url);
+        }catch (Exception ignored){}
     }
 }

@@ -1,6 +1,7 @@
 package com.video.platform.service.util;
 
 
+import com.github.tobato.fastdfs.domain.fdfs.FileInfo;
 import com.github.tobato.fastdfs.domain.fdfs.MetaData;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.service.AppendFileStorageClient;
@@ -8,17 +9,17 @@ import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.video.platform.domain.exception.ConditionException;
 import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Component
@@ -43,6 +44,9 @@ public class FastDFSUtil {
 
     // 2Mb
     private static final int SLICE_SIZE = 1024 * 1024 * 2;
+
+    @Value("${fdfs.http.storage-addr}")
+    private String httpFdfsStorageAddr;
 
     public String getFileType(MultipartFile file){
         if(file == null){
@@ -157,6 +161,43 @@ public class FastDFSUtil {
     public void deleteFile(String filePath){
 
         fastFileStorageClient.deleteFile(filePath);
+    }
+
+    public void viewVideoOnlineBySlices(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        String path) throws Exception{
+        FileInfo fileInfo = fastFileStorageClient.queryFileInfo(DEFAULT_GROUP, path);
+        long totalFileSize = fileInfo.getFileSize();
+        String url = httpFdfsStorageAddr + path;
+        Enumeration<String> headerNames = request.getHeaderNames();
+        Map<String, Object> headers = new HashMap<>();
+        while(headerNames.hasMoreElements()){
+            String header = headerNames.nextElement();
+            headers.put(header, request.getHeader(header));
+        }
+        String rangeStr = request.getHeader("Range");
+        String[] range;
+        if(StringUtil.isNullOrEmpty(rangeStr)){
+            rangeStr = "bytes=0-" + (totalFileSize-1);
+        }
+        range = rangeStr.split("bytes=|-");
+        long begin = 0;
+        if(range.length >= 2){
+            begin = Long.parseLong(range[1]);
+        }
+        long end = totalFileSize-1;
+        if(range.length >= 3){
+            end = Long.parseLong(range[2]);
+        }
+        long len = (end - begin) + 1;
+        String contentRange = "bytes " + begin + "-" + end + "/" + totalFileSize;
+        response.setHeader("Content-Range", contentRange);
+        response.setHeader("Accept-Ranges", "bytes");
+        response.setHeader("Content-Type", "video/mp4");
+        response.setContentLength((int)len);
+        response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+        HttpUtil.get(url, headers, response);
+
     }
 
 
